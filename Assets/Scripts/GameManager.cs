@@ -8,9 +8,12 @@ public class GameManager : MonoBehaviour
     Card playerCard;
     Card CPUCard;
 
+    public Deck CPUDeck;
+
     [SerializeField] private Card objectToSpawn;
 
     public GameObject[] cardPos;
+    public GameObject CPUposition;
     public Card[] cards = new Card[4];
     // Start is called before the first frame update
     void Start()
@@ -27,9 +30,9 @@ public class GameManager : MonoBehaviour
     bool compareSize(int a, int b){
         if(a==1 && b==3 ||b==1 && a==3 ){
             return true;
-        }
-        
+        }else{
             return false;
+        }
     }
 
     void CardComparison(int Card1, int Card2 ){ // index de las cartas (de activeDeck)
@@ -90,6 +93,34 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(1);
             
         }
+        PlayerSelectCard(2);
+        
+    }
+
+    public void PlayerSelectCard(int cardNum){
+        this.playerCard = cards[cardNum];
+        CPUCard = Instantiate(objectToSpawn, CPUposition.transform);
+        this.CPUCard.setValues(CPUDeck.PullCard());
+
+        // Cosas para mover la cámara y la tarjeta
+
+        CardComparison(playerCard.id, CPUCard.id);
+
+        // Cosas para sacar la carta de escena y guardar si ganó o no
+
+        StartCoroutine(WaitforResult(cardNum));
+        
+    }
+
+    public void refillDeck(int cardToRefill){
+        Player.Instance.playerDeck.ReturnCard(cards[cardToRefill].id);
+        cards[cardToRefill].setValues(Player.Instance.playerDeck.PullCard());
+    }
+
+    public IEnumerator WaitforResult(int i){
+            yield return new WaitForSeconds(3);
+        
+        refillDeck(i);
         
     }
 

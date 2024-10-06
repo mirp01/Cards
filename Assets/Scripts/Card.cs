@@ -9,7 +9,6 @@ public class Card : MonoBehaviour
     public int family; // 1:hunter  , 2: wizard , 3: artificies
     public int number; // 1 to 5
     public int border;  // 1: border1, 2: border2, 3:border3
-    public Sprite image;
     public Image imageDisplay;
 
     void Start() {

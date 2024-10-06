@@ -12,11 +12,20 @@ public class Card : MonoBehaviour
     public Image imageDisplay;
 
     void Start() {
-        imageDisplay.sprite = CardDatabase.Instance.getImage(id);
+
     }
 
     // Update is called once per frame
     void Update() {
         
+    }
+
+    public void setValues(int Id){
+        this.id = Id;
+        imageDisplay.sprite = CardDatabase.Instance.getImage(id);
+        this.family = CardDatabase.Cards[Id].family;
+        this.number = CardDatabase.Cards[Id].number;
+        this.border = CardDatabase.Cards[Id].border;
+
     }
 }

@@ -5,8 +5,8 @@ using UnityEngine;
 public class Deck : MonoBehaviour
 {
 
-    public List<int> shuffleDeck;
-    public Queue<int> activeDeck;
+    public List<int> shuffleDeck = new List<int>();
+    public Queue<int> activeDeck = new Queue<int>();
     // Start is called before the first frame update
     void Start()
     {

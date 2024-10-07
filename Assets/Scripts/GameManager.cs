@@ -38,35 +38,19 @@ public class GameManager : MonoBehaviour
     void CardComparison(int Card1, int Card2, int Card1Family, int Card2Family){ // index de las cartas (de activeDeck)
         int Card1Border = CardDatabase.Cards[Card1].border; // Access the border of Card1
         int Card2Border = CardDatabase.Cards[Card2].border; // Access the border of Card2
-        //int X = Card1Family + Card2Family;
-    
-        if(Card1Family != Card2Family){
-            if(compareFamily(Card1Family,Card2Family)){ //si es 3,1 es true, si es otro caso es falso
-                if (Card1Family < Card2Family) {//si es menor gana
-                winsPlayer[Card1Family-1][Card1Border-1]=true;
-                PlayerTracker.showLogo(Card1Family-1, Card1Border-1);
-                checkWin(0);
-                Debug.Log("Card 1 wins (smaller family)");//cambiar los log a otra cosa
-                } else {
-                winsCPU[Card2Family-1][Card2Border-1]=true;
-                CPUTracker.showLogo(Card2Family-1, Card2Family-1);
-                checkWin(1);
-                Debug.Log("Card 2 wins (smaller family)");
-                }
-            }else {
-                if (Card1Family > Card2Family) { //si es mayor gana
-                    winsPlayer[Card1Family-1][Card1Border-1]=true;
-                    PlayerTracker.showLogo(Card1Family-1, Card1Border-1);
-                    checkWin(0);
-                    Debug.Log("Card 1 wins (bigger family)");
-                } else {
-                    winsCPU[Card2Family-1][Card2Border-1]=true;
-                    CPUTracker.showLogo(Card2Family-1, Card2Border-1);
-                    checkWin(1);
-                    Debug.Log("Card 2 wins (bigger family)");
-                }
-            }
+        
+        if(compareFamily(Card1Family,Card2Family)){ //true si gana familia 1
+            winsPlayer[Card1Family-1][Card1Border-1]=true;
+            PlayerTracker.showLogo(Card1Family-1, Card1Border-1);
+            checkWin(0);
+            Debug.Log("Card 1 wins");
+        } else {
+            winsCPU[Card2Family-1][Card2Border-1]=true;
+            CPUTracker.showLogo(Card2Family-1, Card2Border-1);
+            checkWin(1);
+            Debug.Log("Card 2 wins");
         }
+        
     }
 
     void CompareCardNumbers(int Card1Number, int Card2Number, int Card1, int Card2){

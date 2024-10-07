@@ -28,62 +28,63 @@ public class GameManager : MonoBehaviour
         
     }
 
-    bool compareSize(int a, int b){
-        if((a==1 && b==3 )||(b==1 && a==3) ){
-            return true;
-        } else {
-            return false;
-        }
+    private bool compareFamily(int family1, int family2)
+    {
+        return (family1 == 1 && family2 == 3) ||
+               (family1 == 3 && family2 == 2) ||
+               (family1 == 2 && family2 == 1);
     }
 
-    void CardComparison(int Card1, int Card2 ){ // index de las cartas (de activeDeck)
-        int Card1Family = CardDatabase.Cards[Card1].family; // Access the family of Card1
+    void CardComparison(int Card1, int Card2, int Card1Family, int Card2Family){ // index de las cartas (de activeDeck)
         int Card1Border = CardDatabase.Cards[Card1].border; // Access the border of Card1
-        int Card2Family = CardDatabase.Cards[Card2].family; // Access the family of Card2  
         int Card2Border = CardDatabase.Cards[Card2].border; // Access the border of Card2
+        //int X = Card1Family + Card2Family;
     
         if(Card1Family != Card2Family){
-            if(compareSize(Card1Family,Card2Family)){ //si es 3,1 es true, si es otro caso es falso
+            if(compareFamily(Card1Family,Card2Family)){ //si es 3,1 es true, si es otro caso es falso
                 if (Card1Family < Card2Family) {//si es menor gana
                 winsPlayer[Card1Family-1][Card1Border-1]=true;
-                PlayerTracker.showLogo(Card1Family-1,Card1Border-1);
+                PlayerTracker.showLogo(Card1Family-1, Card1Border-1);
                 checkWin(0);
                 Debug.Log("Card 1 wins (smaller family)");//cambiar los log a otra cosa
                 } else {
                 winsCPU[Card2Family-1][Card2Border-1]=true;
-                CPUTracker.showLogo(Card2Family-1,Card2Border-1);
+                CPUTracker.showLogo(Card2Family-1, Card2Family-1);
                 checkWin(1);
                 Debug.Log("Card 2 wins (smaller family)");
                 }
-            } else {
+            }else {
                 if (Card1Family > Card2Family) { //si es mayor gana
                     winsPlayer[Card1Family-1][Card1Border-1]=true;
-                    PlayerTracker.showLogo(Card1Family-1,Card1Border-1);
+                    PlayerTracker.showLogo(Card1Family-1, Card1Border-1);
                     checkWin(0);
                     Debug.Log("Card 1 wins (bigger family)");
                 } else {
                     winsCPU[Card2Family-1][Card2Border-1]=true;
-                    CPUTracker.showLogo(Card2Family-1,Card2Border-1);
+                    CPUTracker.showLogo(Card2Family-1, Card2Border-1);
                     checkWin(1);
                     Debug.Log("Card 2 wins (bigger family)");
                 }
             }
+        }
+    }
+
+    void CompareCardNumbers(int Card1Number, int Card2Number, int Card1, int Card2){
+        int Card1Border = CardDatabase.Cards[Card1].border; // Access the border of Card1
+        int Card2Border = CardDatabase.Cards[Card2].border; // Access the border of Card2
+        int Card1Family = CardDatabase.Cards[Card1].family; // Access the family of Card1
+        int Card2Family = CardDatabase.Cards[Card2].family; // Access the family of Card2
+        
+        if (Card1Number > Card2Number){
+            winsPlayer[Card1Family-1][Card1Border-1]=true;
+            PlayerTracker.showLogo(Card1Family-1, Card1Border-1);
+            Debug.Log("Card 1 wins (more power)");
+        } else if (Card1Number < Card2Number){
+            winsCPU[Card2Family-1][Card2Border-1]=true;
+            CPUTracker.showLogo(Card2Family-1, Card2Border-1);
+            Debug.Log("Card 2 wins (more power)");
         } else {
-            int Card1Number = CardDatabase.Cards[Card1].number; // Access the family of Card1
-            int Card2Number = CardDatabase.Cards[Card2].number; 
-            if (Card1Number > Card2Number) { //si es mayor gana
-                winsPlayer[Card1Family-1][Card1Border-1]=true;
-                PlayerTracker.showLogo(Card1Family-1,Card1Border-1);
-                checkWin(0);
-                Debug.Log("Card 1 wins (more power)");
-            } else if (Card1Number < Card2Number) {
-                winsCPU[Card2Family-1][ Card2Border-1]=true;
-                CPUTracker.showLogo(Card2Family-1,Card2Border-1);
-                checkWin(1);
-                Debug.Log("Card 2 wins (more power)");
-            } else {
-                Debug.Log("Empate");
-            }
+            Debug.Log("Empate");
         }
     }
 
@@ -120,10 +121,20 @@ public class GameManager : MonoBehaviour
         this.playerCard = cards[cardNum];
         CPUCard = Instantiate(objectToSpawn, CPUposition.transform);
         this.CPUCard.setValues(CPUDeck.PullCard());
+        Debug.Log($"Card1Family: {playerCard.family}, Card1Number: {playerCard.number}, Card1Color: {playerCard.border}");
+        Debug.Log($"Card2Family: {CPUCard.family}, Card2Number: {CPUCard.number}, Card2Color: {CPUCard.border}");
 
         // Cosas para mover la cámara y la tarjeta
-        
-        CardComparison(this.playerCard.id, CPUCard.id);
+        int Card1Family = this.playerCard.family; // Access the family of Card1
+        int Card2Family = this.CPUCard.family; // Access the family of Card2
+
+        if (Card1Family != Card2Family) {
+            CardComparison(playerCard.id, CPUCard.id, Card1Family, Card2Family);
+        } else {
+            int Card1Number = this.playerCard.number; 
+            int Card2Number = this.CPUCard.number;
+            CompareCardNumbers(Card1Number, Card2Number, this.playerCard.id, this.CPUCard.id);
+        }
 
         // Cosas para sacar la carta de escena y guardar si ganó o no
 
@@ -187,4 +198,4 @@ public class GameManager : MonoBehaviour
 
 
 
-}   
+}

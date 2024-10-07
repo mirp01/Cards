@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using TMPro;
+//using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -34,6 +34,21 @@ public class GameManager : MonoBehaviour
             winsCPU[i] = new bool[] {false,false,false};
         }
         
+    }
+
+    void Update(){
+        if (Input.GetKeyDown(KeyCode.Q)){
+            PlayerSelectCard(0);
+        }
+        if (Input.GetKeyDown(KeyCode.W)){
+            PlayerSelectCard(1);
+        }
+        if (Input.GetKeyDown(KeyCode.E)){
+            PlayerSelectCard(2);
+        }
+        if (Input.GetKeyDown(KeyCode.R)){
+            PlayerSelectCard(3);
+        }
     }
 
     private bool compareFamily(int family1, int family2)
@@ -184,8 +199,8 @@ public class GameManager : MonoBehaviour
         this.playerCard = cards[cardNum];
         CPUCard = Instantiate(objectToSpawn, CPUposition.transform);
         this.CPUCard.setValues(CPUDeck.PullCard());
-        Debug.Log($"Card1Family: {playerCard.family}, Card1Number: {playerCard.number}, Card1Color: {playerCard.border}");
-        Debug.Log($"Card2Family: {CPUCard.family}, Card2Number: {CPUCard.number}, Card2Color: {CPUCard.border}");
+        //Debug.Log($"Card1Family: {playerCard.family}, Card1Number: {playerCard.number}, Card1Color: {playerCard.border}");
+        //Debug.Log($"Card2Family: {CPUCard.family}, Card2Number: {CPUCard.number}, Card2Color: {CPUCard.border}");
 
         // Cosas para mover la cámara y la tarjeta
         StartCoroutine(Battle(cardNum)); 

@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Net;
 using Unity.ItemRecever;
+using Random= UnityEngine.Random;
 
 public class UnicornSpellerInterface : MonoBehaviour
 {
@@ -41,8 +42,15 @@ public class UnicornSpellerInterface : MonoBehaviour
     {
         ItemReceivedEventArgs eventArgs = (ItemReceivedEventArgs) args;
         Debug.Log(String.Format("Received BoardItem:\tName: {0}\tOutput Text: {1}", eventArgs.BoardItem.Name, eventArgs.BoardItem.OutputText));
-        int position = Convert.ToInt32(eventArgs.BoardItem.OutputText) - 15;
-        gameManager.PlayerSelectCard(position);
+        string value = eventArgs.BoardItem.OutputText;
+        if(value == "15" || value == "16" || value == "17" || value == "18"){
+            int position = int.Parse(value) - 15;
+            gameManager.PlayerSelectCard(position);
+        }else{
+            int rand = Random.Range(0, 4);
+            gameManager.PlayerSelectCard(rand);
+        }
+        
         //Do something...
     }
 }

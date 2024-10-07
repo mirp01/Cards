@@ -1,10 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+
+    public Camera viewCamera;
+
+    public GameObject resultArea;
+    public TextMeshProUGUI resultText;
     Card playerCard;
+    public GameObject endCardPos;
     Card CPUCard;
     public Deck CPUDeck;
 
@@ -43,11 +51,15 @@ public class GameManager : MonoBehaviour
             winsPlayer[Card1Family-1][Card1Border-1]=true;
             PlayerTracker.showLogo(Card1Family-1, Card1Border-1);
             checkWin(0);
+            resultText.text = "You Won!";
+            resultArea.SetActive(true);
             Debug.Log("Card 1 wins");
         } else {
             winsCPU[Card2Family-1][Card2Border-1]=true;
             CPUTracker.showLogo(Card2Family-1, Card2Border-1);
             checkWin(1);
+            resultText.text = "CPU Won";
+            resultArea.SetActive(true);
             Debug.Log("Card 2 wins");
         }
         
@@ -62,10 +74,14 @@ public class GameManager : MonoBehaviour
         if (Card1Number > Card2Number){
             winsPlayer[Card1Family-1][Card1Border-1]=true;
             PlayerTracker.showLogo(Card1Family-1, Card1Border-1);
+            resultText.text = "You Won!";
+            resultArea.SetActive(true);
             Debug.Log("Card 1 wins (more power)");
         } else if (Card1Number < Card2Number){
             winsCPU[Card2Family-1][Card2Border-1]=true;
             CPUTracker.showLogo(Card2Family-1, Card2Border-1);
+            resultText.text = "CPU Won";
+            resultArea.SetActive(true);
             Debug.Log("Card 2 wins (more power)");
         } else {
             Debug.Log("Empate");
@@ -89,26 +105,32 @@ public class GameManager : MonoBehaviour
         for(int i = 0; i < 4; i++){
             cards[i] = Instantiate(objectToSpawn, cardPos[i].transform);
             cards[i].setValues(Player.Instance.playerDeck.PullCard());
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(1f);
             
-        } 
-        PickCard();       
+        }
+        PlayerSelectCard(0);     
     }
 
 
-    public void PickCard(){
-        PlayerSelectCard(0);
+    public IEnumerator Battle(int cardNum){
+        Vector3 startPosition = viewCamera.transform.position;
+        Vector3 endPosition = startPosition + Vector3.up * 1440;
+        Vector3 cardStartPos = this.playerCard.transform.position;
+        Vector3 cardEndPos = endCardPos.transform.position;
 
-    }
+        float elapsedTime = 0.0f;
+        float moveDuration = 3f;
+        while(elapsedTime < moveDuration){
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime/ moveDuration);
 
-    public void PlayerSelectCard(int cardNum){
-        this.playerCard = cards[cardNum];
-        CPUCard = Instantiate(objectToSpawn, CPUposition.transform);
-        this.CPUCard.setValues(CPUDeck.PullCard());
-        Debug.Log($"Card1Family: {playerCard.family}, Card1Number: {playerCard.number}, Card1Color: {playerCard.border}");
-        Debug.Log($"Card2Family: {CPUCard.family}, Card2Number: {CPUCard.number}, Card2Color: {CPUCard.border}");
+            t = t * t * (3f - 2f * t);
 
-        // Cosas para mover la cámara y la tarjeta
+            viewCamera.transform.position = Vector3.Lerp(startPosition, endPosition, t);
+            this.playerCard.transform.position = Vector3.Lerp(cardStartPos, cardEndPos, t);
+            yield return null;
+        }
+
         int Card1Family = this.playerCard.family; // Access the family of Card1
         int Card2Family = this.CPUCard.family; // Access the family of Card2
 
@@ -120,17 +142,54 @@ public class GameManager : MonoBehaviour
             CompareCardNumbers(Card1Number, Card2Number, this.playerCard.id, this.CPUCard.id);
         }
 
+        yield return new WaitForSeconds(2f);
+
         // Cosas para sacar la carta de escena y guardar si ganó o no
 
+        resultArea.SetActive(false);
+        this.playerCard.transform.position = cardStartPos + Vector3.down * 1000;
         CPUDeck.ReturnCard(this.CPUCard.id);
-        StartCoroutine(refillDeck(cardNum));
+
+
+        elapsedTime = 0.0f;
+        while(elapsedTime < moveDuration){
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime/ moveDuration);
+
+            t = t * t * (3f - 2f * t);
+
+            viewCamera.transform.position = Vector3.Lerp(endPosition, startPosition, t);
+            yield return null;
+        }
         
+        Vector3 hiddenPos = this.playerCard.transform.position;
+        Player.Instance.playerDeck.ReturnCard(cards[cardNum].id);
+        cards[cardNum].setValues(Player.Instance.playerDeck.PullCard());
+
+        elapsedTime = 0.0f;
+        moveDuration = 1f;
+        while(elapsedTime < moveDuration){
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime/ moveDuration);
+
+            t = t * t * (3f - 2f * t);
+
+            this.playerCard.transform.position = Vector3.Lerp(hiddenPos, cardStartPos, t);
+            yield return null;
+        }
+
     }
 
-    public IEnumerator refillDeck(int cardToRefill){
-        yield return new WaitForSeconds(0.1f);
-        Player.Instance.playerDeck.ReturnCard(cards[cardToRefill].id);
-        cards[cardToRefill].setValues(Player.Instance.playerDeck.PullCard());
+    public void PlayerSelectCard(int cardNum){
+        this.playerCard = cards[cardNum];
+        CPUCard = Instantiate(objectToSpawn, CPUposition.transform);
+        this.CPUCard.setValues(CPUDeck.PullCard());
+        Debug.Log($"Card1Family: {playerCard.family}, Card1Number: {playerCard.number}, Card1Color: {playerCard.border}");
+        Debug.Log($"Card2Family: {CPUCard.family}, Card2Number: {CPUCard.number}, Card2Color: {CPUCard.border}");
+
+        // Cosas para mover la cámara y la tarjeta
+        StartCoroutine(Battle(cardNum)); 
+        
     }
 
     void checkWin(int table){

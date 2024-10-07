@@ -6,6 +6,7 @@ using Unity.ItemRecever;
 public class UnicornSpellerInterface : MonoBehaviour
 {
     // Start is called before the first frame update
+    public GameManager gameManager;
     void Start()
     {
         try
@@ -40,7 +41,8 @@ public class UnicornSpellerInterface : MonoBehaviour
     {
         ItemReceivedEventArgs eventArgs = (ItemReceivedEventArgs) args;
         Debug.Log(String.Format("Received BoardItem:\tName: {0}\tOutput Text: {1}", eventArgs.BoardItem.Name, eventArgs.BoardItem.OutputText));
-
+        int position = Convert.ToInt32(eventArgs.BoardItem.OutputText) - 15;
+        gameManager.PlayerSelectCard(position);
         //Do something...
     }
 }
